@@ -1,0 +1,40 @@
+# ============================================================================
+# 데이터센터향 태양광·ESS PPA 계약 트래커
+# ----------------------------------------------------------------------------
+# 원칙 (반드시 지킬 것):
+#   1. 공식 보도자료·지속가능성보고서·규제기관 자료를 우선한다.
+#   2. 기사는 제목·날짜·링크·짧은 요약만 적는다. 기사 전문을 옮겨 적지 않는다.
+#   3. official=0 (미확정·추정) 인 건은 확정 파이프라인 집계에서 제외되고
+#      화면에 '기대·추정'으로만 표시된다. 캡티브 기대물량을 확정으로 넣지 말 것.
+#
+# [필드 설명]
+#   row_type          필수. DATA 만 반영.
+#   announced_date    필수. 발표일 YYYY-MM-DD
+#   buyer             필수. 구매자 (Google / Microsoft / Amazon / Meta / Oracle /
+#                     xAI / OpenAI / CoreWeave / SK / KT / NAVER / Kakao ...)
+#   developer         권장. 발전사업자·개발사
+#   country           권장. ISO3 (USA / KOR / ...)
+#   market            선택. 전력시장·ISO (PJM / ERCOT / MISO / CAISO / KPX ...)
+#   tech              권장. solar / solar+ess / wind / other
+#   solar_mw          필수. 태양광 용량 MW (없으면 0)
+#   ess_mw            선택. ESS 출력 MW
+#   ess_mwh           선택. ESS 용량 MWh
+#   contract_years    선택. 계약기간(년)
+#   expected_cod      선택. 예상 상업운전일 YYYY-MM-DD 또는 YYYY
+#   datacenter_linked 필수. 데이터센터 연계면 1, 아니면 0
+#   contract_type     권장. direct_ppa / vppa / utility / green_tariff
+#   official          필수. 공식 발표면 1, 언론보도·추정이면 0
+#   source_name       필수. 출처명
+#   source_url        필수. 원문 링크
+#   source_tier       권장. 1=규제기관 3=기업공식 5=언론
+#   rel_oci           선택. OCI홀딩스 연관성 0/1/2 (0=무관,1=간접,2=직접)
+#   rel_hanwha        선택. 한화솔루션 연관성
+#   rel_hdes          선택. HD현대에너지솔루션 연관성
+#   rel_sket          선택. SK이터닉스 연관성
+#   summary           선택. 한 줄 요약 (직접 작성, 기사 원문 복사 금지)
+#
+# [중복 판단키] announced_date + buyer + developer + solar_mw
+# ============================================================================
+row_type,announced_date,buyer,developer,country,market,tech,solar_mw,ess_mw,ess_mwh,contract_years,expected_cod,datacenter_linked,contract_type,official,source_name,source_url,source_tier,rel_oci,rel_hanwha,rel_hdes,rel_sket,summary
+SAMPLE,2026-05-14,Google,SAMPLE Developer Inc,USA,PJM,solar+ess,300,100,400,15,2028,1,direct_ppa,1,SAMPLE 보도자료,https://example.com/press,3,0,1,0,0,예시 행 — 실제 계약 아님. 삭제하거나 그대로 두면 무시됨
+SAMPLE,2026-06-02,SK,SAMPLE 개발사,KOR,KPX,solar,80,0,0,20,2027,1,direct_ppa,0,SAMPLE 언론보도,https://example.com/news,5,0,0,1,2,예시 행 — 실제 계약 아님. official=0 이므로 확정 집계 제외

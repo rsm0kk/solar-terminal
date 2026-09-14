@@ -1,0 +1,216 @@
+# 데이터 소스 레지스트리
+#
+# tier  : 출처 신뢰도 (1=정부·거래소·규제기관, 2=공식API, 3=공식IR·공시,
+#                      4=산업데이터 제공업체 공개데이터, 5=언론, 6=수기입력)
+# freq  : 원 데이터 발표주기 (daily/business_daily/weekly/monthly/quarterly/yearly/irregular)
+# stale_days : 이 일수를 넘기면 'stale' 로 표시
+# requires : 필요한 환경변수. 비어 있으면 키 없이 동작.
+# enabled  : false 면 수집 시도조차 하지 않음 (수기입력으로 대체)
+#
+# 2026-07-26 실제 호출로 확인한 결과를 status 필드에 기록해 둔다.
+
+sources:
+  # ── 키 없이 동작이 확인된 소스 ──────────────────────────────
+  owid_solar:
+    label: Our World in Data — 국가별 태양광
+    adapter: owid
+    tier: 4
+    freq: yearly
+    stale_days: 400
+    requires: []
+    enabled: true
+    verified: "2026-07-26 200 OK"
+    url: https://ourworldindata.org/grapher
+    license: CC BY 4.0
+    datasets:
+      solar_generation_twh: solar-energy-consumption
+      solar_share_pct: share-electricity-solar
+      solar_capacity_gw: installed-solar-PV-capacity
+
+  ember_monthly:
+    label: Ember — 월간 국가별 발전량
+    adapter: ember
+    tier: 4
+    freq: monthly
+    stale_days: 60
+    requires: []
+    enabled: true
+    # Ember REST API 는 키를 요구하지만(403 No API key set),
+    # 공개 다운로드 CSV 는 키 없이 접근 가능하다. 우회가 아니라 공식 공개 배포 경로다.
+    verified: "2026-07-26 200 OK (70MB CSV)"
+    url: https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/monthly_full_release_long_format.csv
+    license: CC BY-SA 4.0
+    countries: [KOR, USA, CHN, IND, DEU, JPN]
+
+  openmeteo_solar:
+    label: Open-Meteo — 일사량 예보·실측
+    adapter: openmeteo
+    tier: 2
+    freq: daily
+    stale_days: 3
+    requires: []
+    enabled: true
+    verified: "2026-07-26 200 OK"
+    url: https://open-meteo.com
+    license: CC BY 4.0 (비상업 무료)
+
+  nasa_power:
+    label: NASA POWER — 일사량 장기평년
+    adapter: nasa_power
+    tier: 1
+    freq: daily
+    stale_days: 20   # POWER 는 수일 지연 발행
+    requires: []
+    enabled: true
+    verified: "2026-07-26 200 OK (DNI는 -999 결측 빈번)"
+    url: https://power.larc.nasa.gov
+    license: public domain
+
+  naver_stock:
+    label: 네이버 금융 — 국내 주가
+    adapter: naver_stock
+    tier: 4
+    freq: business_daily
+    stale_days: 3
+    requires: []
+    enabled: true
+    verified: "2026-07-26 200 OK (OHLCV + 외국인소진율)"
+    url: https://finance.naver.com
+    note: 공개 시세 조회 엔드포인트. 대량·고빈도 호출 금지, 1일 1회만 조회한다.
+
+  # ── 기존 보유 키로 동작하는 소스 ────────────────────────────
+  dart:
+    label: OpenDART — 공시·재무
+    adapter: dart
+    tier: 1
+    freq: daily
+    stale_days: 2
+    requires: [DART_API_KEY]
+    enabled: true
+    verified: "2026-07-26 status 000 정상"
+    url: https://opendart.fss.or.kr
+    filing_days: 180
+    quarters_back: 12
+
+  fred:
+    label: FRED — 거시지표
+    adapter: fred
+    tier: 1
+    freq: monthly
+    stale_days: 60
+    requires: [FRED_API_KEY]
+    enabled: true
+    url: https://fred.stlouisfed.org
+    series:
+      DEXKOUS: [원/달러 환율, KRW/USD]
+      DEXCHUS: [위안/달러 환율, CNY/USD]   # RMB 표시 공급망 가격을 USD 로 환산할 때 사용
+
+  # ── 키 발급이 필요한 소스 (없으면 'API 미설정' 카드로 표시) ──
+  eia:
+    label: EIA — 미국 전력·태양광
+    adapter: eia
+    tier: 1
+    freq: monthly
+    stale_days: 75
+    requires: [EIA_API_KEY]
+    enabled: true
+    verified: "2026-07-26 403 API_KEY_MISSING — 키 발급 필요"
+    signup: https://www.eia.gov/opendata/register.php
+    url: https://api.eia.gov/v2
+
+  kpx:
+    label: 전력거래소(KPX) — SMP·REC
+    adapter: kpx
+    tier: 1
+    freq: daily
+    stale_days: 4
+    requires: [DATA_GO_KR_SERVICE_KEY]
+    enabled: true
+    # 2026-07-26 확인: 보유 중인 data.go.kr 키는 유효하나(관세청 API 200 정상)
+    # KPX API 는 500 응답 → 해당 API 개별 '활용신청' 미승인 상태.
+    # 같은 키로 활용신청만 하면 동작한다. 새 키 발급 불필요.
+    verified: "2026-07-26 500 — 활용신청 필요"
+    signup: https://www.data.go.kr
+    url: https://apis.data.go.kr/B552115
+
+  # ── 자동수집 불가 → 수기입력 대체 ───────────────────────────
+  # 아래 소스들은 유료이거나 로그인이 필요하거나 이용약관상 자동수집이
+  # 불명확하다. 우회하지 않고 data/manual/*.csv 입력으로 대체한다.
+  supply_chain_prices:
+    label: 태양광 공급망 가격 (폴리실리콘·웨이퍼·셀·모듈)
+    adapter: manual_csv
+    tier: 6
+    freq: weekly
+    stale_days: 14
+    requires: []
+    enabled: true
+    file: solar_supply_chain_prices.csv
+    upstream_refs:
+      - name: InfoLink Consulting
+        url: https://www.infolink-group.com/energy-article/solar-price
+        note: 공개 스팟가격 페이지. 유료 구독 데이터는 사용하지 않는다.
+      - name: TrendForce / EnergyTrend
+        url: https://www.energytrend.com/solar-price.html
+      - name: Bernreuter Research
+        url: https://www.bernreuter.com/polysilicon/polysilicon-price
+      - name: pvXchange
+        url: https://www.pvxchange.com/Price-Index
+
+  company_kpi:
+    label: 기업 산업 KPI (IR 자료 기반)
+    adapter: manual_csv
+    tier: 3
+    freq: quarterly
+    stale_days: 130
+    requires: []
+    enabled: true
+    file: company_kpi_manual.csv
+
+  manual_estimates:
+    label: 애널리스트 추정치·컨센서스
+    adapter: manual_csv
+    tier: 6
+    freq: quarterly
+    stale_days: 130
+    requires: []
+    enabled: true
+    file: manual_estimates.csv
+
+  ppa_deals:
+    label: 데이터센터향 PPA 계약
+    adapter: manual_csv
+    tier: 3
+    freq: irregular
+    stale_days: 400
+    requires: []
+    enabled: true
+    file: ppa_deals_manual.csv
+
+  capacity_pipeline:
+    label: 기업 생산능력·파이프라인
+    adapter: manual_csv
+    tier: 3
+    freq: quarterly
+    stale_days: 130
+    requires: []
+    enabled: true
+    file: company_capacity_pipeline.csv
+
+# staleness 기준 (sources 개별값이 없을 때 freq 로 적용)
+staleness_by_freq:
+  business_daily: 3
+  daily: 3
+  weekly: 10
+  monthly: 45
+  quarterly: 120
+  yearly: 400
+  irregular: 400
+
+# 출처 등급 라벨
+tier_labels:
+  1: 정부·거래소
+  2: 공식 API
+  3: 공시·IR
+  4: 산업데이터
+  5: 언론
+  6: 수기입력

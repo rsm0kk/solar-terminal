@@ -1,0 +1,32 @@
+# ============================================================================
+# 애널리스트 추정치·컨센서스 수동 입력
+# ----------------------------------------------------------------------------
+# 왜 수동인가: 컨센서스는 유료 데이터(FnGuide·Quantiwise·Bloomberg)다.
+#   자동 수집하지 않는다. 여기에 없으면 밸류에이션 탭은 '데이터 없음'으로 표시되며
+#   숫자를 지어내지 않는다.
+#
+# [필드 설명]
+#   row_type      필수. DATA 만 반영.
+#   period        필수. YYYYQn 또는 YYYY (연간 추정). 12개월 선행은 FY 표기 대신
+#                 해당 연도를 쓴다 (예: 2026).
+#   company_id    필수. oci / hanwha / hdes / sket
+#   metric_id     필수. 아래 중 하나를 권장:
+#                 revenue_est, op_profit_est, net_profit_est, ebitda_est,
+#                 eps_est, bps_est, per_fwd, pbr_fwd, ev_ebitda_fwd, target_price
+#   value         필수. 숫자만.
+#   unit          필수. 십억원 / 원 / 배 / %
+#   currency      선택. KRW
+#   estimate_type 권장. consensus / house / analyst
+#   n_estimates   선택. 컨센서스 참여 기관 수
+#   source_name   권장. 예: FnGuide 컨센서스
+#   source_url    선택.
+#   note          선택.
+#
+# [중복 판단키] period + company_id + metric_id + source_name
+# [주의] 이 파일의 값은 전부 is_estimate=1 로 저장되어 화면에 '추정' 배지가 붙는다.
+# ============================================================================
+row_type,period,company_id,metric_id,value,unit,currency,estimate_type,n_estimates,source_name,source_url,note
+SAMPLE,2026,oci,op_profit_est,180,십억원,KRW,consensus,7,FnGuide 컨센서스,,예시값 — 실제 수치 아님
+SAMPLE,2026,hanwha,ebitda_est,1450,십억원,KRW,consensus,12,FnGuide 컨센서스,,예시값 — 실제 수치 아님
+SAMPLE,2026,hdes,per_fwd,14.2,배,,consensus,5,FnGuide 컨센서스,,예시값 — 실제 수치 아님
+SAMPLE,2026,sket,op_profit_est,95,십억원,KRW,house,1,사내추정,,예시값 — 실제 수치 아님

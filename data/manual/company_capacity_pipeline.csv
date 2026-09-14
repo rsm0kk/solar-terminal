@@ -1,0 +1,33 @@
+# ============================================================================
+# 기업 생산능력·개발 파이프라인
+# ----------------------------------------------------------------------------
+# 제조사는 생산능력(공장), 개발사는 프로젝트 파이프라인을 적는다.
+# 공식 공시·IR 로 확인된 것만 status=confirmed 로 둔다.
+# 기대·추정 물량은 status=expected 로 두면 확정 집계에서 빠지고
+# 화면에 '기대·추정' 배지로만 표시된다.
+#
+# [필드 설명]
+#   row_type      필수. DATA 만 반영.
+#   company_id    필수. oci / hanwha / hdes / sket
+#   asset_name    필수. 공장명 또는 프로젝트명
+#   asset_type    권장. plant(생산설비) / project(발전프로젝트)
+#   stage         권장. 제조: operating / under_construction / planned
+#                       개발: pipeline / development / permitting / construction / operating
+#   capacity_mw   필수. 용량. 제조설비는 연간 생산능력(MW 기준), 발전은 설비용량 MW.
+#                 폴리실리콘처럼 MW 로 표현 못 하면 capacity_other 에 적는다.
+#   capacity_other 선택. 예: 35000
+#   capacity_unit  선택. MT / GW / MW
+#   country       권장. ISO3 (KOR / USA / MYS ...)
+#   value_chain   권장. polysilicon / wafer / cell / module / epc / generation
+#   expected_cod  선택. YYYY-MM-DD 또는 YYYY
+#   status        필수. confirmed(공시·IR 확인) / expected(기대·추정)
+#   source_name   필수.
+#   source_url    필수.
+#   note          선택.
+#
+# [중복 판단키] company_id + asset_name + stage
+# ============================================================================
+row_type,company_id,asset_name,asset_type,stage,capacity_mw,capacity_other,capacity_unit,country,value_chain,expected_cod,status,source_name,source_url,note
+SAMPLE,oci,SAMPLE 말레이시아 공장,plant,operating,,35000,MT,MYS,polysilicon,,confirmed,SAMPLE IR,https://example.com,예시 행 — 실제 수치 아님
+SAMPLE,hanwha,SAMPLE Cartersville,plant,operating,3300,,MW,USA,cell,2025,confirmed,SAMPLE IR,https://example.com,예시 행 — 실제 수치 아님
+SAMPLE,sket,SAMPLE 태양광 프로젝트,project,development,80,,MW,KOR,generation,2028,expected,SAMPLE 언론,https://example.com,예시 행 — status=expected 라 확정 집계 제외

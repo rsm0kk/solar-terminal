@@ -1,0 +1,37 @@
+# ============================================================================
+# 태양광 공급망 가격 수동 입력
+# ----------------------------------------------------------------------------
+# 왜 수동인가: InfoLink·TrendForce·Bernreuter·pvXchange 의 스팟가격은 유료
+#   구독이거나 이용약관상 자동수집이 불명확하다. 우회하지 않고 여기에 옮겨 적는다.
+#   공개 페이지에서 눈으로 확인되는 값만 입력한다.
+#
+# 입력 주기: 주 1회 (보통 수요일 갱신)
+#
+# [필드 설명]
+#   row_type    필수. DATA 만 대시보드에 반영. SAMPLE 은 예시이므로 무시된다.
+#   date        필수. 가격 기준일. 형식 YYYY-MM-DD
+#   metric_id   필수. config/metrics.yaml 에 정의된 id 를 그대로 쓴다.
+#               poly_price_china_dense / poly_price_china_granular / poly_price_nonchina
+#               wafer_price_m10 / wafer_price_g12 / wafer_price_210r
+#               cell_price_topcon_m10 / cell_price_topcon_g12 / cell_price_topcon_g12r
+#               module_price_china_fob / module_price_eu_ddp / module_price_us_ddp
+#               module_price_us_domestic / module_price_kr
+#   value       필수. 숫자만 (쉼표 허용). 단위 환산하지 말고 원 단위 그대로.
+#   unit        필수. RMB/kg, USD/kg, RMB/pc, RMB/W, USD/W, EUR/W, KRW/W
+#   currency    선택. RMB / USD / EUR / KRW
+#   entity      선택. 비우면 GLOBAL
+#   is_estimate 선택. 추정치면 1
+#   source_name 권장. 어디서 본 값인지 (예: InfoLink 공개 스팟)
+#   source_url  권장. 확인한 페이지 주소
+#   note        선택. 규격·두께 등 부가정보
+#
+# [중복 판단키] date + metric_id + source_name
+#   같은 키로 다시 입력하면 값이 갱신되고, 이전 값과 다르면 '과거 데이터 수정'으로
+#   품질보고서에 기록된다.
+# ============================================================================
+row_type,date,metric_id,value,unit,currency,entity,is_estimate,source_name,source_url,note
+SAMPLE,2026-07-22,poly_price_china_dense,38.5,RMB/kg,RMB,CHN,0,InfoLink 공개 스팟,https://www.infolink-group.com/energy-article/solar-price,N-type dense 예시값 — 실제 수치 아님
+SAMPLE,2026-07-22,poly_price_nonchina,19.8,USD/kg,USD,GLOBAL,0,Bernreuter 공개자료,https://www.bernreuter.com/polysilicon/polysilicon-price,비중국산 예시값 — 실제 수치 아님
+SAMPLE,2026-07-22,cell_price_topcon_m10,0.285,RMB/W,RMB,CHN,0,TrendForce 공개,https://www.energytrend.com/solar-price.html,예시값 — 실제 수치 아님
+SAMPLE,2026-07-22,module_price_china_fob,0.092,USD/W,USD,CHN,0,InfoLink 공개 스팟,https://www.infolink-group.com/energy-article/solar-price,예시값 — 실제 수치 아님
+SAMPLE,2026-07-22,module_price_us_ddp,0.31,USD/W,USD,USA,0,pvXchange 지수,https://www.pvxchange.com/Price-Index,예시값 — 실제 수치 아님

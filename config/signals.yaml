@@ -1,0 +1,169 @@
+# 시그널 엔진 설정
+#
+# 각 시그널은 지표의 변화율을 -2 ~ +2 로 점수화한다.
+# 점수는 '방향성 참고치'이며 실적 확정치가 아니다.
+#
+# metric   : metrics.yaml 의 metric_id
+# window   : 비교 기간 (wow=전주, mom=전월, dod=전일, qoq=전분기, yoy=전년동기)
+# thresholds : 변화율(%) 구간 → 점수. 오름차순으로 평가한다.
+#              [-inf, t1) = -2 / [t1, t2) = -1 / [t2, t3) = 0 / [t3, t4) = +1 / [t4, inf) = +2
+# max_age_days : 데이터가 이보다 오래되면 시그널에서 제외하고 그 사실을 표시한다
+# invert   : true 면 점수 부호를 뒤집는다 (값이 오르면 부정인 지표)
+
+signals:
+  poly_premium_widening:
+    label: 비중국산 폴리실리콘 프리미엄
+    metric: nonchina_poly_premium
+    window: wow
+    thresholds: [-10, -3, 3, 10]
+    max_age_days: 21
+    rationale: 프리미엄 확대는 비중국 공급망 보유업체의 ASP·마진에 직결
+
+  china_poly_rebound:
+    label: 중국 폴리실리콘 가격
+    metric: poly_price_china_dense
+    window: wow
+    thresholds: [-5, -1.5, 1.5, 5]
+    max_age_days: 21
+    rationale: 중국 가격 반등은 업스트림 전반의 업황 바닥 확인 신호
+
+  cell_module_spread_up:
+    label: 셀→모듈 스프레드
+    metric: cell_module_spread
+    window: wow
+    thresholds: [-8, -2, 2, 8]
+    max_age_days: 21
+    rationale: 셀 매입가 하락분을 모듈가가 방어하면 모듈 제조마진 개선
+
+  us_module_price_up:
+    label: 미국 모듈 가격
+    metric: module_price_us_ddp
+    window: wow
+    thresholds: [-4, -1, 1, 4]
+    max_age_days: 21
+    rationale: 미국 현지 프리미엄은 미국 생산능력 보유업체 수익성에 직결
+
+  us_module_shipments_up:
+    label: 미국 모듈 출하량
+    metric: us_module_shipments_mw
+    window: mom
+    thresholds: [-12, -4, 4, 12]
+    max_age_days: 80
+    rationale: 미국 설치 수요의 실측 대리지표
+
+  us_solar_generation_up:
+    label: 미국 태양광 발전량
+    metric: us_solar_generation_gwh
+    window: yoy
+    thresholds: [-5, 0, 8, 20]
+    max_age_days: 80
+    rationale: 누적 설치량 증가의 후행 확인
+
+  smp_up:
+    label: 육지 SMP
+    metric: smp_land
+    window: wow
+    thresholds: [-8, -2, 2, 8]
+    max_age_days: 7
+    rationale: 발전사업자 전력판매 단가
+
+  rec_up:
+    label: REC 현물가
+    metric: rec_spot_price
+    window: wow
+    thresholds: [-6, -2, 2, 6]
+    max_age_days: 7
+    rationale: 발전사업자 REC 판매수익
+
+  smp_rec_revenue_up:
+    label: SMP+REC 환산수익
+    metric: smp_rec_revenue
+    window: wow
+    thresholds: [-6, -2, 2, 6]
+    max_age_days: 7
+    rationale: 국내 태양광 발전 수익환경 종합
+
+  kr_solar_generation_up:
+    label: 국내 태양광 발전량
+    metric: kr_solar_generation
+    window: yoy
+    thresholds: [-8, -2, 2, 8]
+    max_age_days: 10
+    rationale: 국내 설비 증가와 발전여건 반영
+
+  datacenter_ppa_up:
+    label: 데이터센터 PPA 신규계약
+    metric: datacenter_ppa_mw
+    window: mom
+    thresholds: [-20, -5, 5, 20]
+    max_age_days: 120
+    rationale: 개발·PPA 사업자의 파이프라인 선행지표
+
+  fx_up:
+    label: 원/달러 환율
+    metric: usd_krw
+    window: wow
+    thresholds: [-2, -0.5, 0.5, 2]
+    # FRED DEXKOUS 는 실제로 1주일 이상 지연 발행된다 (2026-07-26 확인 시 9일 지연).
+    # 7일로 잡으면 정상 데이터가 매번 제외되므로 여유를 둔다.
+    max_age_days: 14
+    rationale: 수출비중이 높은 업체의 원화환산 실적에 영향
+
+  ghi_vs_normal:
+    label: 일사량 평년대비
+    metric: ghi_normal_dev_pct
+    window: level
+    thresholds: [-15, -5, 5, 15]
+    max_age_days: 4
+    rationale: 단기 발전량 변동 요인
+
+# 기업별 가중치. 절대값이 클수록 해당 시그널이 그 기업 점수에 크게 반영된다.
+# 음수는 역방향(그 시그널이 오르면 그 기업엔 부정)을 뜻한다.
+# 가중치는 사업구조에 대한 판단이므로 '추정' 등급으로 표시된다.
+weights:
+  oci:
+    poly_premium_widening: 3.0
+    china_poly_rebound: 2.0
+    fx_up: 1.5
+    us_module_shipments_up: 1.0
+    us_solar_generation_up: 0.5
+    cell_module_spread_up: 0.0
+    us_module_price_up: 0.5
+
+  hanwha:
+    us_module_price_up: 3.0
+    us_module_shipments_up: 2.5
+    us_solar_generation_up: 1.5
+    cell_module_spread_up: 1.5
+    fx_up: 1.0
+    china_poly_rebound: -0.5     # 원가 상승 요인
+    poly_premium_widening: -0.5  # 비중국 폴리 조달원가 상승
+
+  hdes:
+    cell_module_spread_up: 3.0
+    kr_solar_generation_up: 1.5
+    smp_rec_revenue_up: 1.0
+    china_poly_rebound: -1.0     # 셀·웨이퍼 매입원가 상승
+    us_module_price_up: 0.5
+    ghi_vs_normal: 0.3
+
+  sket:
+    smp_rec_revenue_up: 3.0
+    smp_up: 1.5
+    rec_up: 1.5
+    datacenter_ppa_up: 2.5
+    kr_solar_generation_up: 1.5
+    ghi_vs_normal: 0.5
+
+# 총점 → 라벨 구간
+verdict_bands:
+  - [-999, -3.0, 부정]
+  - [-3.0, -1.0, 약부정]
+  - [-1.0, 1.0, 중립]
+  - [1.0, 3.0, 약긍정]
+  - [3.0, 999, 긍정]
+
+# 신뢰도 계산: 사용된 시그널의 데이터 신선도·출처등급 가중평균
+confidence:
+  min_signals: 3        # 이보다 적으면 '판단보류'
+  tier_score: {1: 1.0, 2: 0.95, 3: 0.9, 4: 0.75, 5: 0.6, 6: 0.5}

@@ -1,0 +1,164 @@
+# 커버리지 기업 정의
+# corp_code(DART 고유번호)는 비워두면 corpCode.xml 에서 이름으로 자동 매칭한다.
+# exposure: 밸류체인 노출도 히트맵 (0=무관, 1=간접, 2=일부, 3=핵심)
+# 노출도는 사업구조에 대한 판단값이므로 출처등급 'estimate' 로 표기된다.
+
+companies:
+  - id: oci
+    name: OCI홀딩스
+    stock_code: "010060"
+    corp_code: null
+    market: KOSPI
+    model: 폴리실리콘 제조·지주
+    thesis: 비중국산 폴리실리콘 및 미국 태양광 공급망 수혜
+    key_multiples: [PBR, EV/EBITDA, NAV]
+    # 실적을 움직이는 1차 변수
+    primary_drivers:
+      - nonchina_poly_premium
+      - poly_price_nonchina
+      - usd_krw
+      - us_policy_risk
+    exposure:
+      polysilicon: 3
+      wafer: 1
+      cell: 0
+      module: 0
+      epc: 0
+      development: 0
+      generation: 1
+      ppa: 0
+      datacenter: 1
+      us_policy: 3
+      kr_policy: 1
+    manual_kpi_keys:
+      - malaysia_poly_capacity_mt
+      - poly_production_mt
+      - poly_utilization_pct
+      - ltc_contracted_mt
+      - us_solar_revenue_krw_bn
+      - us_solar_op_profit_krw_bn
+
+  - id: hanwha
+    name: 한화솔루션
+    stock_code: "009830"
+    corp_code: null
+    market: KOSPI
+    model: 셀·모듈 제조 + 발전개발 (Qcells)
+    thesis: 미국 설치량·모듈가격·45X 세액공제 레버리지
+    key_multiples: [EV/EBITDA, PBR, SOTP]
+    primary_drivers:
+      - module_price_us_ddp
+      - us_solar_installs
+      - us_module_shipments
+      - us_policy_risk
+    exposure:
+      polysilicon: 1
+      wafer: 1
+      cell: 3
+      module: 3
+      epc: 1
+      development: 2
+      generation: 2
+      ppa: 2
+      datacenter: 2
+      us_policy: 3
+      kr_policy: 1
+    manual_kpi_keys:
+      - qcells_revenue_krw_bn
+      - qcells_op_profit_krw_bn
+      - us_cell_capacity_gw
+      - us_module_capacity_gw
+      - module_shipment_gw
+      - module_asp_usd_w
+      - tax_credit_45x_krw_bn
+
+  - id: hdes
+    name: HD현대에너지솔루션
+    stock_code: "322000"
+    corp_code: null
+    market: KOSPI
+    model: 모듈 제조 + EPC·인버터
+    thesis: 셀 매입가 대비 모듈 ASP 스프레드
+    key_multiples: [PER, EV/EBIT, POR]
+    primary_drivers:
+      - cell_module_spread
+      - cell_price_topcon_m10
+      - module_price_china_fob
+      - kr_solar_installs
+    exposure:
+      polysilicon: 0
+      wafer: 1
+      cell: 2
+      module: 3
+      epc: 2
+      development: 1
+      generation: 1
+      ppa: 1
+      datacenter: 0
+      us_policy: 2
+      kr_policy: 3
+    manual_kpi_keys:
+      - module_capacity_gw
+      - module_utilization_pct
+      - module_shipment_gw
+      - module_asp_krw_w
+      - cell_purchase_price_usd_w
+      - gross_margin_pct
+
+  - id: sket
+    name: SK이터닉스
+    stock_code: "475150"
+    corp_code: null
+    market: KOSPI
+    model: 태양광 개발·PPA·전력판매
+    thesis: 국내 설치·PPA 수요·데이터센터 전력수요 → 개발 파이프라인 → 전력판매
+    key_multiples: [개발용역 영업이익 멀티플, 발전자산 NAV, SOTP]
+    primary_drivers:
+      - smp_rec_revenue
+      - smp_land
+      - rec_spot_price
+      - kr_solar_generation
+      - datacenter_ppa_mw
+    exposure:
+      polysilicon: 0
+      wafer: 0
+      cell: 0
+      module: 0
+      epc: 2
+      development: 3
+      generation: 3
+      ppa: 3
+      datacenter: 3
+      us_policy: 0
+      kr_policy: 3
+    manual_kpi_keys:
+      - operating_solar_mw
+      - pipeline_solar_mw
+      - dev_backlog_krw_bn
+      - ppa_contracted_mw
+      - spc_equity_stake_pct
+
+# 비교 지수·글로벌 피어 (주가 상대비교용)
+benchmarks:
+  - id: kospi
+    name: KOSPI
+    symbol: "KOSPI"
+    kind: index
+  - id: kosdaq
+    name: KOSDAQ
+    symbol: "KOSDAQ"
+    kind: index
+
+# 밸류체인 노출도 히트맵 라벨
+exposure_labels:
+  polysilicon: 폴리실리콘
+  wafer: 웨이퍼
+  cell: 셀
+  module: 모듈
+  epc: EPC
+  development: 개발용역
+  generation: 발전
+  ppa: PPA
+  datacenter: 데이터센터
+  us_policy: 미국 정책
+  kr_policy: 국내 정책

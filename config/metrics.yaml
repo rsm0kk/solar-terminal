@@ -1,0 +1,432 @@
+# 지표 사전
+#
+# unit      : 표시 단위 (변환하지 않는다. 단위가 다른 지표는 같은 축에 그리지 않는다)
+# axis_group: 같은 값이어야 한 차트의 같은 축에 그릴 수 있다
+# freq      : 원 데이터 발표주기
+# tab       : 표시될 탭
+# good      : up = 값이 오르면 긍정, down = 내리면 긍정, neutral = 방향성 없음
+#             (여기서 '긍정'은 태양광 밸류체인 전반 기준이며 기업별 해석은 signals.yaml)
+
+metrics:
+  # ── 공급망 가격 ────────────────────────────────────────────
+  poly_price_china_dense:
+    label: 중국 N-type dense 폴리실리콘
+    unit: RMB/kg
+    axis_group: poly_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  poly_price_china_granular:
+    label: 중국 granular 폴리실리콘
+    unit: RMB/kg
+    axis_group: poly_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  poly_price_nonchina:
+    label: 비중국산 폴리실리콘
+    unit: USD/kg
+    axis_group: poly_usd
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  nonchina_poly_premium:
+    label: 비중국산 폴리실리콘 프리미엄
+    unit: "%"
+    axis_group: pct
+    freq: weekly
+    tab: supply
+    good: up
+    derived: true
+    formula: (poly_price_nonchina - poly_price_china_dense_usd) / poly_price_china_dense_usd * 100
+    note: 중국가는 환율로 USD/kg 환산 후 비교. 환산 기준일을 함께 기록한다.
+
+  wafer_price_m10:
+    label: N-type M10 웨이퍼
+    unit: RMB/pc
+    axis_group: wafer_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  wafer_price_g12:
+    label: N-type G12 웨이퍼
+    unit: RMB/pc
+    axis_group: wafer_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  wafer_price_210r:
+    label: N-type 210R 웨이퍼
+    unit: RMB/pc
+    axis_group: wafer_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+
+  cell_price_topcon_m10:
+    label: M10 TOPCon 셀
+    unit: RMB/W
+    axis_group: cell_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  cell_price_topcon_g12:
+    label: G12 TOPCon 셀
+    unit: RMB/W
+    axis_group: cell_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  cell_price_topcon_g12r:
+    label: G12R TOPCon 셀
+    unit: RMB/W
+    axis_group: cell_rmb
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+
+  module_price_china_fob:
+    label: 중국 TOPCon 모듈 (FOB China)
+    unit: USD/W
+    axis_group: module_usd
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  module_price_eu_ddp:
+    label: 모듈 DDP Europe
+    unit: EUR/W
+    axis_group: module_eur
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  module_price_us_ddp:
+    label: 모듈 DDP US
+    unit: USD/W
+    axis_group: module_usd
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  module_price_us_domestic:
+    label: 미국 현지생산 모듈
+    unit: USD/W
+    axis_group: module_usd
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+  module_price_kr:
+    label: 국내 프로젝트용 모듈
+    unit: KRW/W
+    axis_group: module_krw
+    freq: weekly
+    tab: supply
+    good: up
+    source: supply_chain_prices
+
+  cell_module_spread:
+    label: 셀→모듈 스프레드
+    unit: USD/W
+    axis_group: module_usd
+    freq: weekly
+    tab: supply
+    good: up
+    derived: true
+    formula: module_price_china_fob - cell_price_topcon_m10_usd
+    note: 셀가는 환율로 USD/W 환산. 모듈 제조마진의 대리지표.
+  us_china_module_premium:
+    label: 미국-중국 모듈 가격차
+    unit: "%"
+    axis_group: pct
+    freq: weekly
+    tab: supply
+    good: up
+    derived: true
+    formula: (module_price_us_ddp - module_price_china_fob) / module_price_china_fob * 100
+
+  # ── 글로벌 수요 ────────────────────────────────────────────
+  solar_generation_twh:
+    label: 태양광 발전량
+    unit: TWh
+    axis_group: twh
+    freq: yearly
+    tab: global
+    good: up
+    source: owid_solar
+  solar_share_pct:
+    label: 전력믹스 내 태양광 비중
+    unit: "%"
+    axis_group: pct
+    freq: yearly
+    tab: global
+    good: up
+    source: owid_solar
+  solar_capacity_gw:
+    label: 누적 태양광 설비용량
+    unit: GW
+    axis_group: gw
+    freq: yearly
+    tab: global
+    good: up
+    source: owid_solar
+  solar_generation_monthly_twh:
+    label: 월간 태양광 발전량
+    unit: TWh
+    axis_group: twh
+    freq: monthly
+    tab: global
+    good: up
+    source: ember_monthly
+  electricity_demand_monthly_twh:
+    label: 월간 전력수요
+    unit: TWh
+    axis_group: twh
+    freq: monthly
+    tab: global
+    good: up
+    source: ember_monthly
+  us_module_shipments_mw:
+    label: 미국 PV 모듈 출하량
+    unit: MW
+    axis_group: mw
+    freq: monthly
+    tab: global
+    good: up
+    source: eia
+  us_solar_generation_gwh:
+    label: 미국 태양광 발전량 (유틸리티 규모)
+    unit: GWh
+    axis_group: gwh
+    freq: monthly
+    tab: global
+    good: up
+    source: eia
+    note: |
+      EIA Form EIA-923 은 1MW 이상 유틸리티 규모 발전소만 집계한다.
+      지붕형 등 분산전원은 빠져 있어 Ember(분산 포함) 대비 약 25% 낮게 나온다.
+      2026-08-16 교차검증: 2025-12~2026-05 6개월 모두 -23~-27% 로 일관.
+      두 수치를 합성하지 말 것 — 측정 대상이 다르다.
+      원 단위 'thousand megawatthours' 가 곧 GWh (환산 없음).
+  us_electricity_sales:
+    label: 미국 전력 소매판매
+    unit: million kWh
+    axis_group: mkwh
+    freq: monthly
+    tab: global
+    good: up
+    source: eia
+    note: 전력수요 대리지표. 태양광·전력기기 수요의 1차 동인
+
+  # ── 국내 전력시장 ──────────────────────────────────────────
+  smp_land:
+    label: 육지 SMP
+    unit: 원/kWh
+    axis_group: krw_kwh
+    freq: daily
+    tab: korea
+    good: up
+    source: kpx
+  smp_jeju:
+    label: 제주 SMP
+    unit: 원/kWh
+    axis_group: krw_kwh
+    freq: daily
+    tab: korea
+    good: up
+    source: kpx
+  rec_spot_price:
+    label: REC 현물 평균가
+    unit: 원/REC
+    axis_group: krw_rec
+    freq: daily
+    tab: korea
+    good: up
+    source: kpx
+  rec_spot_volume:
+    label: REC 현물 거래량
+    unit: REC
+    axis_group: rec_vol
+    freq: daily
+    tab: korea
+    good: neutral
+    source: kpx
+  smp_rec_revenue:
+    label: SMP+REC 환산수익
+    unit: 원/kWh
+    axis_group: krw_kwh
+    freq: daily
+    tab: korea
+    good: up
+    derived: true
+    formula: smp_land + (rec_spot_price * rec_weight / 1000)
+    note: |
+      1 REC = 1MWh 단순 환산. REC 가중치 기본 1.0 (프로젝트별로 다름).
+      실제 계약수익이 아닌 시장가격 기반 참고치.
+  kr_solar_generation:
+    label: 국내 태양광 발전량
+    unit: MWh
+    axis_group: mwh
+    freq: daily
+    tab: korea
+    good: up
+    source: kpx
+  kr_solar_capacity_mw:
+    label: 태양광 시장참여 설비용량
+    unit: MW
+    axis_group: mw
+    freq: monthly
+    tab: korea
+    good: up
+    source: kpx
+
+  # ── 일사량 ────────────────────────────────────────────────
+  ghi_daily:
+    label: 수평면 일사량(GHI)
+    unit: MJ/m2
+    axis_group: irradiance
+    freq: daily
+    tab: korea
+    good: up
+    source: openmeteo_solar
+  sunshine_hours:
+    label: 일조시간
+    unit: h
+    axis_group: hours
+    freq: daily
+    tab: korea
+    good: up
+    source: openmeteo_solar
+  ghi_normal_dev_pct:
+    label: 일사량 평년대비
+    unit: "%"
+    axis_group: pct
+    freq: daily
+    tab: korea
+    good: up
+    derived: true
+    note: NASA POWER 장기평년 대비 최근 7일·30일 편차
+
+  # ── 주가·밸류에이션 ────────────────────────────────────────
+  close_price:
+    label: 종가
+    unit: 원
+    axis_group: krw
+    freq: business_daily
+    tab: company
+    good: up
+    source: naver_stock
+  market_cap:
+    label: 시가총액
+    unit: 십억원
+    axis_group: krw_bn
+    freq: business_daily
+    tab: valuation
+    good: neutral
+  trade_volume:
+    label: 거래량
+    unit: 주
+    axis_group: shares
+    freq: business_daily
+    tab: company
+    good: neutral
+    source: naver_stock
+  foreign_ratio:
+    label: 외국인소진율
+    unit: "%"
+    axis_group: pct
+    freq: business_daily
+    tab: company
+    good: up
+    source: naver_stock
+
+  # ── 실적 (DART) ───────────────────────────────────────────
+  revenue_q:
+    label: 분기 매출액
+    unit: 십억원
+    axis_group: krw_bn
+    freq: quarterly
+    tab: company
+    good: up
+    source: dart
+    note: 누적 손익계산서에서 직전분기 차감으로 단독분기 환산
+  op_profit_q:
+    label: 분기 영업이익
+    unit: 십억원
+    axis_group: krw_bn
+    freq: quarterly
+    tab: company
+    good: up
+    source: dart
+  net_profit_q:
+    label: 분기 순이익
+    unit: 십억원
+    axis_group: krw_bn
+    freq: quarterly
+    tab: company
+    good: up
+    source: dart
+  op_margin_q:
+    label: 영업이익률
+    unit: "%"
+    axis_group: pct
+    freq: quarterly
+    tab: company
+    good: up
+    derived: true
+  net_debt:
+    label: 순차입금
+    unit: 십억원
+    axis_group: krw_bn
+    freq: quarterly
+    tab: company
+    good: down
+    source: dart
+
+  # ── 데이터센터 PPA ─────────────────────────────────────────
+  datacenter_ppa_mw:
+    label: 데이터센터향 태양광 PPA
+    unit: MW
+    axis_group: mw
+    freq: irregular
+    tab: datacenter
+    good: up
+    source: ppa_deals
+  datacenter_ess_mwh:
+    label: 데이터센터향 ESS
+    unit: MWh
+    axis_group: mwh
+    freq: irregular
+    tab: datacenter
+    good: up
+    source: ppa_deals
+
+  # ── 거시 ─────────────────────────────────────────────────
+  usd_krw:
+    label: 원/달러 환율
+    unit: KRW/USD
+    axis_group: fx
+    freq: daily
+    tab: global
+    good: up
+    source: fred
+    note: OCI·한화 수출단가에 직접 영향
+
+# 통화 환산에 사용할 기준 (환산 시 기준일을 반드시 함께 기록)
+fx_pairs:
+  USD_KRW: usd_krw
+  RMB_USD: rmb_usd
+  EUR_USD: eur_usd
+
+# 기본 REC 가중치 (화면에서 사용자가 조정 가능)
+rec_weight_default: 1.0

@@ -1,0 +1,16 @@
+# 태양광 대시보드 — 파이썬 의존성
+# Python 3.11+ 권장 (로컬 개발환경은 3.14 에서도 동작 확인)
+
+pandas>=2.0
+requests>=2.31
+pydantic>=2.5
+PyYAML>=6.0
+pyarrow>=14.0
+python-dotenv>=1.0
+
+# 테스트
+pytest>=7.4
+
+# HTML 표 파싱이 필요한 어댑터를 추가할 때 사용 (현재는 미사용)
+beautifulsoup4>=4.12
+lxml>=5.0

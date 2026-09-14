@@ -1,0 +1,110 @@
+name: 태양광 대시보드 자동 갱신
+
+on:
+  schedule:
+    # 21:30 UTC = 06:30 KST (다음날). GitHub Actions cron 은 UTC 기준이다.
+    - cron: "30 21 * * *"
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: "기준일 (YYYY-MM-DD, 비우면 오늘)"
+        required: false
+      only:
+        description: "특정 소스만 수집 (쉼표 구분, 예: owid_solar,dart)"
+        required: false
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: solar-dashboard
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40    # EIA 응답이 70~85초, Ember CSV 70MB — 여유를 둔다
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 누적 데이터·캐시 복원
+        # 상태를 커밋하지 않고 캐시로 잇는다. 키가 매번 새로우므로 항상 저장되고,
+        # restore-keys 로 직전 실행분을 복원한다.
+        #   data/history   누적 시계열 (수집 실패 시 '마지막 정상값 유지'의 근거)
+        #   data/processed 소스 상태·공시·평년값
+        #   data/.cache    HTTP 응답 캐시 + DART corpCode
+        #   data/raw       Ember 70MB CSV (3일 TTL)
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/history
+            data/processed
+            data/.cache
+            data/raw
+          key: solar-data-${{ github.run_id }}
+          restore-keys: |
+            solar-data-
+
+      - name: 데이터 수집 및 빌드
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          PYTHONIOENCODING: "utf-8"
+        run: |
+          python scripts/update_all.py \
+            ${{ github.event.inputs.as_of && format('--as-of {0}', github.event.inputs.as_of) || '' }} \
+            ${{ github.event.inputs.only && format('--only {0}', github.event.inputs.only) || '' }}
+
+      - name: 데이터 검증
+        run: python scripts/validate_data.py
+
+      - name: 테스트
+        run: python -m pytest tests -q
+
+      - name: 산출물 보관 (14일)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-${{ github.run_number }}
+          path: |
+            out/*.html
+            public/data/*.json
+          retention-days: 14
+
+      - name: 사이트 준비
+        # 저장소 전체가 아니라 index.html 하나만 올린다.
+        # (캐시로 복원된 data/ 가 작업 폴더에 있으므로 '.' 을 올리면 100MB 가 딸려간다)
+        run: |
+          mkdir -p _site
+          cp index.html _site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

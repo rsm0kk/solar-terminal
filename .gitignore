@@ -1,0 +1,32 @@
+# API 키 — 절대 커밋 금지
+.env
+secrets.json
+
+# 파이썬
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# 대용량 원본·캐시 (Actions 가 actions/cache 로 이어받는다)
+data/raw/
+data/.cache/
+*.corrupt-*.parquet
+
+# 누적 데이터·산출물은 커밋하지 않는다.
+# GitHub Actions 가 매일 새로 만들고, 상태는 actions/cache 로 잇고,
+# 화면은 GitHub Pages 로만 내보낸다. 커밋하면 저장소가 하루 400KB 씩 불어난다.
+data/history/
+data/processed/
+out/
+public/data/
+index.html
+
+# 수기 입력 CSV(data/manual/)는 커밋한다 — Actions 도 그 값을 써야 하므로.
+
+# 편집기·세션·OS
+.claude/
+Thumbs.db
+.DS_Store
+desktop.ini

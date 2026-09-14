@@ -1,0 +1,39 @@
+# ============================================================================
+# 기업 산업 KPI 수동 입력 (IR 자료·실적발표 기반)
+# ----------------------------------------------------------------------------
+# 왜 수동인가: 생산능력·가동률·출하량·부문별 실적은 DART 재무제표에 표준화된
+#   계정으로 존재하지 않는다. IR 자료에서만 확인된다. 자동으로 추측하지 않는다.
+#
+# 입력 주기: 분기 실적발표 후
+#
+# [필드 설명]
+#   row_type    필수. DATA 만 반영. SAMPLE 은 무시.
+#   period      필수. 분기 형식 YYYYQn (예: 2026Q1). 월간이면 YYYY-MM 도 가능.
+#   company_id  필수. oci / hanwha / hdes / sket  (config/companies.yaml 의 id)
+#   kpi_key     필수. companies.yaml 의 manual_kpi_keys 참고. 주요 예:
+#     [oci]    malaysia_poly_capacity_mt, poly_production_mt, poly_utilization_pct,
+#              ltc_contracted_mt, us_solar_revenue_krw_bn, us_solar_op_profit_krw_bn
+#     [hanwha] qcells_revenue_krw_bn, qcells_op_profit_krw_bn, us_cell_capacity_gw,
+#              us_module_capacity_gw, module_shipment_gw, module_asp_usd_w,
+#              tax_credit_45x_krw_bn
+#     [hdes]   module_capacity_gw, module_utilization_pct, module_shipment_gw,
+#              module_asp_krw_w, cell_purchase_price_usd_w, gross_margin_pct
+#     [sket]   operating_solar_mw, pipeline_solar_mw, dev_backlog_krw_bn,
+#              ppa_contracted_mw, spc_equity_stake_pct
+#   value       필수. 숫자만.
+#   unit        필수. 십억원 / GW / MW / MT / % / USD/W / KRW/W
+#   currency    선택. KRW / USD
+#   is_estimate 선택. 회사 발표가 아닌 추정이면 1
+#   source_name 권장. 예: 2026Q1 실적발표 IR
+#   source_url  권장. IR 자료 링크
+#   note        선택.
+#
+# [중복 판단키] period + company_id + kpi_key
+# [필수 여부] row_type, period, company_id, kpi_key, value, unit 이 없으면 그 행은 건너뛴다.
+# ============================================================================
+row_type,period,company_id,kpi_key,value,unit,currency,is_estimate,source_name,source_url,note
+SAMPLE,2026Q1,oci,malaysia_poly_capacity_mt,35000,MT,,0,IR 자료,https://www.ocinfo.co.kr,말레이시아 태양광용 폴리실리콘 생산능력 예시 — 실제 수치 아님
+SAMPLE,2026Q1,oci,poly_utilization_pct,88,%,,0,IR 자료,https://www.ocinfo.co.kr,예시값 — 실제 수치 아님
+SAMPLE,2026Q1,hanwha,qcells_op_profit_krw_bn,120,십억원,KRW,0,2026Q1 실적발표,https://www.hanwhasolutions.com,예시값 — 실제 수치 아님
+SAMPLE,2026Q1,hdes,module_asp_krw_w,340,KRW/W,KRW,0,IR 자료,https://www.hd-es.com,예시값 — 실제 수치 아님
+SAMPLE,2026Q1,sket,operating_solar_mw,420,MW,,0,IR 자료,https://www.sketernix.co.kr,운영 중 태양광 발전용량 예시 — 실제 수치 아님
